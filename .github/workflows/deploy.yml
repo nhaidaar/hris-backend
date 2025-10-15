@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main # or master
+      - main # deploy when pushing to main
 
 jobs:
   deploy:
@@ -13,34 +13,37 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build --if-present
-
-      - name: Copy files to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "."
-          target: ${{ secrets.VPS_PATH }}
-
-      - name: Run remote commands on VPS
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            # Go to project directory
             cd ${{ secrets.VPS_PATH }}
-            sudo npm ci
-            sudo npx prisma migrate deploy
-            sudo pm2 restart hris-backend || sudo pm2 start npm --name "hris-backend" -- start
+
+            # If repo doesn't exist, clone it first
+            if [ ! -d ".git" ]; then
+              echo "Repository not found. Cloning..."
+              git clone https://github.com/${{ github.repository }} .
+            fi
+
+            # Make sure we're on main branch
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Install dependencies
+            if [ -f package-lock.json ]; then
+              echo "Installing dependencies using npm ci"
+              npm ci
+            else
+              echo "Installing dependencies using npm install"
+              npm install
+            fi
+
+            # Run Prisma migrations (if any)
+            npx prisma migrate deploy
+
+            # Restart or start app
+            pm2 restart hris-backend || pm2 start npm --name "hris-backend" -- start
