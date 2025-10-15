@@ -41,6 +41,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ${{ secrets.VPS_PATH }}
-            npm ci
-            npx prisma migrate deploy
-            pm2 restart hris-backend || pm2 start npm --name "hris-backend" -- start
+            sudo npm ci
+            sudo npx prisma migrate deploy
+            sudo pm2 restart hris-backend || sudo pm2 start npm --name "hris-backend" -- start
