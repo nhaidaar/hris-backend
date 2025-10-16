@@ -2,7 +2,7 @@ import { User } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 
 import { ResponseUtil } from '../utils/responseUtils';
-import { redis } from '../redis/client';
+import { redis } from '../configs/redis';
 import { verifyAccess } from '../utils/jwtUtils';
 
 declare global {

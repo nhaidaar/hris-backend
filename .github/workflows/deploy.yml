@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main # deploy when pushing to main
+      - main
 
 jobs:
   deploy:
@@ -23,13 +23,13 @@ jobs:
             # Go to project directory
             cd ${{ secrets.VPS_PATH }}
 
-            # If repo doesn't exist, clone it first
+            # Clone repo if missing
             if [ ! -d ".git" ]; then
               echo "Repository not found. Cloning..."
               git clone https://github.com/${{ github.repository }} .
             fi
 
-            # Make sure we're on main branch
+            # Update code from main branch
             git fetch origin main
             git reset --hard origin/main
 
@@ -45,5 +45,11 @@ jobs:
             # Run Prisma migrations (if any)
             npx prisma migrate deploy
 
-            # Restart or start app
+            # Restart API app
             pm2 restart hris-backend || pm2 start npm --name "hris-backend" -- start
+
+            # Restart worker process
+            pm2 restart hris-worker || pm2 start npm --name "hris-worker" -- run worker
+
+            # Save PM2 processes so they auto-start after reboot
+            pm2 save

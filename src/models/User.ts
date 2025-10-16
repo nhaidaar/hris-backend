@@ -1,4 +1,4 @@
-import prisma from '../prisma/client';
+import prisma from '../configs/prisma';
 import { User, UserStatus, Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
@@ -61,5 +61,10 @@ export const UserModel = {
 
   async setStatus(userId: string, status: UserStatus): Promise<User> {
     return prisma.user.update({ where: { id: userId }, data: { status } });
+  },
+
+  async changePassword(userId: string, newPassword: string): Promise<User> {
+    const hashed = await bcrypt.hash(newPassword, 10);
+    return prisma.user.update({ where: { id: userId }, data: { password: hashed } });
   },
 };
