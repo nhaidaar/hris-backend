@@ -34,13 +34,8 @@ jobs:
             git reset --hard origin/main
 
             # Install dependencies
-            if [ -f package-lock.json ]; then
-              echo "Installing dependencies using npm ci"
-              npm ci
-            else
-              echo "Installing dependencies using npm install"
-              npm install
-            fi
+            echo "Installing dependencies using npm install"
+            npm install
 
             # Run Prisma migrations (if any)
             npx prisma migrate deploy
