@@ -9,7 +9,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "worker": "ts-node src/worker.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,11 +19,13 @@
     "@prisma/client": "^6.17.0",
     "axios": "^1.6.7",
     "bcrypt": "^6.0.0",
+    "bull": "^4.16.5",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.9",
     "redis": "^4.7.0"
   },
   "devDependencies": {
@@ -33,6 +36,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.7.0",
+    "@types/nodemailer": "^7.0.2",
     "nodemon": "^3.1.10",
     "prisma": "^6.17.0",
     "ts-node": "^10.9.2",
